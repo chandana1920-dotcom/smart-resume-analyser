@@ -61,7 +61,8 @@ const Upload = () => {
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         score: data.atsScore,
         name: file.name,
-        status: data.atsScore >= 70 ? 'Strong Match' : 'Needs Work'
+        status: data.atsScore >= 70 ? 'Strong Match' : 'Needs Work',
+        fullData: data
       };
       localStorage.setItem('resumeHistory', JSON.stringify([newEntry, ...existingHistory]));
       

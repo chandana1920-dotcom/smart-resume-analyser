@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, ArrowRight, GitCommit } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const History = () => {
   const [history, setHistory] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('resumeHistory');
@@ -11,6 +12,15 @@ const History = () => {
       setHistory(JSON.parse(savedHistory));
     }
   }, []);
+
+  const handleView = (item) => {
+    if (item.fullData) {
+      localStorage.setItem('resumeAnalysis', JSON.stringify(item.fullData));
+      navigate('/');
+    } else {
+      alert("Full report data is not available for this legacy entry. Please re-upload.");
+    }
+  };
 
   if (history.length === 0) {
     return (
@@ -70,9 +80,13 @@ const History = () => {
                   </span>
                 </td>
                 <td style={{ padding: '16px 8px' }}>
-                  <button style={{ background: 'transparent', border: 'none', color: 'var(--accent-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    View <ArrowRight size={14} />
-                  </button>
+                  {item.fullData ? (
+                    <button onClick={() => handleView(item)} style={{ background: 'transparent', border: 'none', color: 'var(--accent-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      View <ArrowRight size={14} />
+                    </button>
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Data Expired</span>
+                  )}
                 </td>
               </tr>
             ))}
