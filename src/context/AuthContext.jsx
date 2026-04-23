@@ -32,10 +32,14 @@ export const AuthProvider = ({ children }) => {
         navigate('/');
         return { success: true };
       } else {
-        return { success: false, message: data.message };
+        return { success: false, message: data.message || 'Login failed' };
       }
     } catch (error) {
-      return { success: false, message: 'Server error' };
+      console.error('Login error:', error);
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        return { success: false, message: 'Cannot connect to server. Please check if the server is running.' };
+      }
+      return { success: false, message: 'Network error. Please try again.' };
     }
   };
 
@@ -54,10 +58,14 @@ export const AuthProvider = ({ children }) => {
         navigate('/');
         return { success: true };
       } else {
-        return { success: false, message: data.message };
+        return { success: false, message: data.message || 'Registration failed' };
       }
     } catch (error) {
-      return { success: false, message: 'Server error' };
+      console.error('Registration error:', error);
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        return { success: false, message: 'Cannot connect to server. Please check if the server is running.' };
+      }
+      return { success: false, message: 'Network error. Please try again.' };
     }
   };
 
