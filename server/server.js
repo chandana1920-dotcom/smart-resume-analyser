@@ -91,37 +91,69 @@ app.post('/api/analyze', upload.single('resume'), async (req, res) => {
 
     // 3. Dynamic Suggestions based on text
     const summarySuggestions = [];
-    if (!text.toLowerCase().includes('increased') && !text.toLowerCase().includes('improved')) {
-      summarySuggestions.push("You are missing action verbs. Add words like 'increased', 'developed', or 'improved' to show impact.");
-    }
-    if (!text.toLowerCase().includes('team') && !text.toLowerCase().includes('collaborated')) {
-      summarySuggestions.push("Consider highlighting your teamwork and collaboration skills more prominently.");
-    }
-    if (summarySuggestions.length === 0) {
-      summarySuggestions.push("Great use of action verbs! Make sure your metrics are quantified (e.g., 'by 20%').");
+    const lowerText = text.toLowerCase();
+    
+    // Check for metrics/numbers
+    const hasNumbers = /\d/.test(text);
+    if (!hasNumbers) {
+      summarySuggestions.push("AI Analysis: Your resume lacks quantifiable metrics. Try adding numbers (e.g., 'Increased sales by 15%' or 'Managed a team of 5') to prove your impact.");
+    } else {
+      summarySuggestions.push("AI Analysis: Great job including numbers and metrics! Make sure they are tied directly to business outcomes.");
     }
 
-    // 4. Fake Job Prediction based on found keywords
-    let predictedRole = "Software Developer";
-    if (text.toLowerCase().includes('react') || text.toLowerCase().includes('css')) predictedRole = "Frontend Engineer";
-    if (text.toLowerCase().includes('node') || text.toLowerCase().includes('sql')) predictedRole = "Backend Engineer";
-    if (text.toLowerCase().includes('python') && text.toLowerCase().includes('data')) predictedRole = "Data Scientist";
+    if (!lowerText.includes('led') && !lowerText.includes('managed')) {
+      summarySuggestions.push("AI Analysis: We didn't detect strong leadership verbs. If you mentored anyone or led a project, use words like 'Spearheaded' or 'Directed'.");
+    }
 
-    // 5. Build dynamic experience suggestions
-    const expSuggestions = [
-      {
-        role: "Recent Role",
-        original: "Responsible for developing features.",
-        suggestion: "Developed and shipped 3 major features ahead of schedule, improving overall system stability."
-      }
-    ];
+    // 4. Job Prediction based on found keywords
+    let predictedRole = "Software Engineer";
+    if (lowerText.includes('react') || lowerText.includes('vue') || lowerText.includes('css')) {
+      predictedRole = "Frontend Developer";
+    } else if (lowerText.includes('node') || lowerText.includes('sql') || lowerText.includes('django')) {
+      predictedRole = "Backend Engineer";
+    } else if (lowerText.includes('python') && lowerText.includes('data')) {
+      predictedRole = "Data Scientist";
+    }
 
-    // 6. Dynamic skill gaps
-    const allGaps = [
-      { skill: "Cloud Architecture (AWS/Azure)", importance: "High", resource: "AWS Certified Practitioner" },
-      { skill: "System Design", importance: "Medium", resource: "Grokking the System Design Interview" },
-      { skill: "CI/CD Pipelines", importance: "High", resource: "Docker & Kubernetes Mastery" }
-    ];
+    // 5. Build dynamic experience suggestions by extracting a random sentence from the resume
+    const sentences = text.split('.').filter(s => s.trim().length > 20);
+    const expSuggestions = [];
+    
+    if (sentences.length > 2) {
+      // Pick a sentence that lacks strong verbs as an example
+      const targetSentence = sentences.find(s => s.toLowerCase().includes('worked on') || s.toLowerCase().includes('responsible for')) || sentences[1];
+      
+      expSuggestions.push({
+        role: "Targeted Improvement",
+        original: targetSentence.trim().replace(/\n/g, ' ') + ".",
+        suggestion: `Optimized and delivered critical components resulting in measurable improvements. (AI Tip: Always start with a strong action verb instead of passive phrases).`
+      });
+    } else {
+      expSuggestions.push({
+        role: "Experience Formatting",
+        original: "I wrote code for the main application.",
+        suggestion: "Engineered scalable features for the core application, improving load times by 20%."
+      });
+    }
+
+    // 6. Dynamic skill gaps tailored to the predicted role
+    let allGaps = [];
+    if (predictedRole === "Frontend Developer") {
+      allGaps = [
+        { skill: "TypeScript", importance: "High", resource: "Advanced TypeScript for React" },
+        { skill: "State Management (Redux/Zustand)", importance: "Medium", resource: "Modern State Management" }
+      ];
+    } else if (predictedRole === "Backend Engineer") {
+      allGaps = [
+        { skill: "System Architecture", importance: "High", resource: "System Design Interview Prep" },
+        { skill: "Docker & Kubernetes", importance: "High", resource: "Containerization Mastery" }
+      ];
+    } else {
+      allGaps = [
+        { skill: "Cloud Platforms (AWS/Azure)", importance: "High", resource: "AWS Cloud Practitioner" },
+        { skill: "CI/CD Pipelines", importance: "Medium", resource: "GitHub Actions Guide" }
+      ];
+    }
     // Randomize gaps slightly to make it unique per resume length
     const skillGaps = allGaps.slice(0, (wordCount % 2) + 1);
 

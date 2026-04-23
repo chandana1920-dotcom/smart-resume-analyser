@@ -24,6 +24,36 @@ const Dashboard = () => {
     );
   }
 
+  const handleDownload = () => {
+    const reportText = `
+SMART RESUME ANALYZER REPORT
+----------------------------------
+Predicted Role: ${data.predictedRole}
+ATS Score: ${data.atsScore}/100
+
+AI SUMMARY SUGGESTIONS:
+${data.summarySuggestions.map(s => `- ${s}`).join('\n')}
+
+EXPERIENCE ENHANCEMENTS:
+${data.experienceSuggestions.map(exp => `- Role: ${exp.role}\n  Suggestion: ${exp.suggestion}`).join('\n\n')}
+
+SKILL GAPS DETECTED:
+${data.skillGaps.map(gap => `- Missing: ${gap.skill} (${gap.importance} Priority)`).join('\n')}
+    `;
+    const blob = new Blob([reportText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Resume_Report.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleClear = () => {
+    localStorage.removeItem('resumeAnalysis');
+    window.location.reload();
+  };
+
   return (
     <div className="animate-fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
@@ -31,9 +61,14 @@ const Dashboard = () => {
           <h2 style={{ fontSize: '1.8rem', marginBottom: '8px' }}>Resume Analytics</h2>
           <p style={{ color: 'var(--text-muted)' }}>Here is your AI-powered resume analysis.</p>
         </div>
-        <button className="btn btn-secondary">
-          <Download size={18} /> Download Report
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="btn btn-secondary" onClick={handleClear} style={{ color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+            Clear Data
+          </button>
+          <button className="btn btn-secondary" onClick={handleDownload}>
+            <Download size={18} /> Download Report
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>

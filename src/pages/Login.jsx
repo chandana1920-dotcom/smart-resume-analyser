@@ -31,14 +31,16 @@ const Login = () => {
 
         {error && <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Email</label>
             <input 
               type="email" 
+              name="email"
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required
+              autoComplete="new-password"
               style={{ width: '100%', padding: '12px 16px', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white' }} 
             />
           </div>
@@ -46,9 +48,11 @@ const Login = () => {
             <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Password</label>
             <input 
               type="password" 
+              name="password"
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
               required
+              autoComplete="new-password"
               style={{ width: '100%', padding: '12px 16px', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white' }} 
             />
           </div>

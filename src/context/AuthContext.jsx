@@ -9,12 +9,11 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for logged-in user in local storage
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    // The user requested to "add sign in before open the dashboard page"
+    // To ensure they always see the login page when opening the app, we disable persistent sessions.
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
     setLoading(false);
   }, []);
 
@@ -65,14 +64,23 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('resumeAnalysis');
+    localStorage.removeItem('resumeHistory');
     setUser(null);
     navigate('/login');
+  };
+
+  const updateUser = (updatedFields) => {
+    const newUser = { ...user, ...updatedFields };
+    localStorage.setItem('user', JSON.stringify(newUser));
+    setUser(newUser);
+    return { success: true };
   };
 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

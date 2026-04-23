@@ -4,7 +4,16 @@ import { AuthContext } from '../context/AuthContext';
 
 const Settings = () => {
   const [privacyMode, setPrivacyMode] = useState(false);
-  const { user } = useContext(AuthContext);
+  const { user, updateUser } = useContext(AuthContext);
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [saveMessage, setSaveMessage] = useState('');
+
+  const handleSave = () => {
+    updateUser({ name, email });
+    setSaveMessage('Settings saved successfully!');
+    setTimeout(() => setSaveMessage(''), 3000);
+  };
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '800px' }}>
@@ -75,15 +84,16 @@ const Settings = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Full Name</label>
-                <input type="text" defaultValue={user?.name || ''} style={{ width: '100%', padding: '10px 16px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white' }} />
+                <input type="text" value={name} onChange={e => setName(e.target.value)} style={{ width: '100%', padding: '10px 16px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Email Address</label>
-                <input type="email" defaultValue={user?.email || ''} style={{ width: '100%', padding: '10px 16px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white' }} />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '10px 16px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white' }} />
               </div>
             </div>
-            <div>
-              <button className="btn btn-primary" style={{ marginTop: '8px' }}>Save Changes</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <button className="btn btn-primary" onClick={handleSave} style={{ marginTop: '8px' }}>Save Changes</button>
+              {saveMessage && <span style={{ color: 'var(--success)', fontSize: '0.85rem', marginTop: '8px' }}>{saveMessage}</span>}
             </div>
           </div>
         </div>
