@@ -4,7 +4,7 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('./db');
+const db = require('./db-json');
 
 const app = express();
 app.use(cors());
