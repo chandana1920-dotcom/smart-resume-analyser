@@ -4,11 +4,17 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 const db = require('./db-json');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the frontend build directory
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist')));
+}
 
 const upload = multer({ storage: multer.memoryStorage() });
 const JWT_SECRET = 'super-secret-jwt-key-for-smart-resume';
@@ -179,5 +185,15 @@ app.post('/api/analyze', upload.single('resume'), async (req, res) => {
   }
 });
 
-const PORT = 5000;
+// Catch-all handler to serve the frontend for any non-API routes
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  });
+}
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
